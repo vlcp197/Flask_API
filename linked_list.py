@@ -9,6 +9,17 @@ class LinkedList:
         self.head = None
         self.last_node = None
         
+    def to_list(self):
+        l = []
+        if self.head is None:
+            return l
+        
+        node = self.head
+        while node:
+            l.append(node.data)
+            node = node.next_node
+        return l
+        
     def print_ll(self):
         ll_string = ""
         node = self.head
@@ -20,13 +31,27 @@ class LinkedList:
             
         ll_string += "None"
         print(ll_string)
+    
+    def insert_beginning(self,data):
+        if self.head is None:
+            self.head = Node(data, None)
+            self.last_node = self.head
+            
+        new_node = Node(data, self.head)
+        self.head = new_node
         
-ll = LinkedList()
-node4 = Node("data",None)
-node3 = Node("data",node4)
-node2 = Node("data",node3)
-node1 = Node("data",node2)
+    def insert_at_end(self, data):
+        if self.head is None:
+            self.insert_beginning(data)
 
-ll.head = node1
-
-ll.print_ll()        
+      
+        self.last_node.next_node = Node(data, None)
+        self.last_node = self.last_node.next_node
+        
+    def get_user_by_id(self, user_id):
+        node = self.head
+        while node:
+            if node.data["id"] is int(user_id):
+                return node.data
+            node = node.next_node
+        return None
