@@ -8,4 +8,6 @@ class Data:
         self.key = key 
         self.value = value
         
-class
+class HashTable:
+    def __init__(self, table_size):
+        self.table_size = table_size
