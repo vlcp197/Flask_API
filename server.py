@@ -1,4 +1,4 @@
-#1:30:41
+#2:36:36
 from email.headerregistry import Address
 import json
 from sqlite3 import Connection as SQLite3Connection, dbapi2
@@ -9,6 +9,9 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from flask_sqlalchemy import SQLAlchemy
 import linked_list
+import binary_search_tree
+import hash_table
+import random
 
 #app
 app = Flask(__name__)
@@ -124,11 +127,50 @@ def delete_user(user_id):
 
 @app.route("/blog_post/<user_id>", methods=["POST"])
 def create_blog_post(user_id):
-    pass
-
+    data = request.get_json()
+    
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({"message":"user does not exist"}),480
+    
+    ht = hash_table.HashTable(10)
+    
+    ht.add_key_value("title",data["title"])
+    ht.add_key_value("body", data["body"])
+    ht.add_key_value("date", now)
+    ht.add_key_value("user_id", user_id)
+    
+    new_blog_post = BlogPost(
+        title=ht.get_value("title"),
+        body=ht.get_value("body"),
+        date=ht.get_value("date"),
+        user_id=ht.get_value("user_id"),
+    )
+    db.session.add(new_blog_post)
+    db.session.commit()
+    return jsonify({"message":"new blog post created"}), 200
+    
 @app.route("/blog_post/<user_id>", methods=["GET"])
-def get_all_blog_posts(user_id):
-    pass
+def get_all_blog_posts(blog_post_id):
+    blog_posts = BlogPost.query.all()
+    random.shuffle(blog_posts)
+
+    bst = binary_search_tree.BinarySearchTree() 
+    
+    for post in blog_posts:
+        bst.insert({
+            "id" : post.id,
+            "title" : post.title,
+            "body" : post.body,
+            "user_id" : post.user_id  
+        })
+
+    post = bst.search(blog_post_id)
+    
+    if not post:
+        return jsonify({"message":"post not found"})
+
+    return jsonify(post)
 
 @app.route("/blog_post/<blog_post_id>",methods=["GET"])
 def get_one_blog_post(blog_post_id):
